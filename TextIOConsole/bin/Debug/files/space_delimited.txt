@@ -1,0 +1,5 @@
+LastName FirstName Gender DOB FavoriteColor
+Doe Jane F 2/17/1991 red
+Smith John M 4/20/1985 green
+Taylor Henry M 1/13/1965 blue
+Griffin Jen F 4/3/1979 cyan
