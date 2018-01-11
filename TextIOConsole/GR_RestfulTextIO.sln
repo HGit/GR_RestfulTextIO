@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextIO", "..\TextIO\TextIO.csproj", "{C2549349-8D0D-4FCE-B304-04623B595E82}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextIO_UnitTesting", "..\TextIO_UnitTesting\TextIO_UnitTesting.csproj", "{BC500521-49C3-4ED1-AB3C-D29939A58B05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextIOAPI", "..\TextIOAPI\TextIOAPI.csproj", "{C5A364CF-FDBD-429F-9CA6-1D8E13D02B55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextIOAPI.Tests", "TextIOAPI.Tests\TextIOAPI.Tests.csproj", "{01260BC1-F06D-4342-BA9C-1E7D583C1F71}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C2549349-8D0D-4FCE-B304-04623B595E82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2549349-8D0D-4FCE-B304-04623B595E82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2549349-8D0D-4FCE-B304-04623B595E82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2549349-8D0D-4FCE-B304-04623B595E82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC500521-49C3-4ED1-AB3C-D29939A58B05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC500521-49C3-4ED1-AB3C-D29939A58B05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC500521-49C3-4ED1-AB3C-D29939A58B05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC500521-49C3-4ED1-AB3C-D29939A58B05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5A364CF-FDBD-429F-9CA6-1D8E13D02B55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5A364CF-FDBD-429F-9CA6-1D8E13D02B55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5A364CF-FDBD-429F-9CA6-1D8E13D02B55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5A364CF-FDBD-429F-9CA6-1D8E13D02B55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01260BC1-F06D-4342-BA9C-1E7D583C1F71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01260BC1-F06D-4342-BA9C-1E7D583C1F71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01260BC1-F06D-4342-BA9C-1E7D583C1F71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01260BC1-F06D-4342-BA9C-1E7D583C1F71}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
