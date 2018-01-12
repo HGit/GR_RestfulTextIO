@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace TextIO_UnitTesting
 {
 	[TestClass]
-	public class TextIOUnitTests
+	public class TextIOTests
 	{
 		[TestMethod]
 		public void TestMethod1()
