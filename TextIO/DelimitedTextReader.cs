@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Data;
+using Newtonsoft.Json;
 
-
-namespace GR.Text
+namespace GR.TextIO
 {
 	public class DelimitedTextReader : IDelimitedTextReader, IDisposable
 	{
@@ -46,6 +46,77 @@ namespace GR.Text
 			this.RightEnclosure = rightEnclosure;
 		}
 
+
+
+
+
+		
+		
+		#region IDisposable_impl
+
+		// ***************************************************************************
+		// BEGIN DISPOSE IMPLEMENTATION
+		// ***************************************************************************
+
+		// To keep track of Dispose calls in case it is called repeatedly for some reason...
+		private bool AlreadyDisposed = false;
+
+
+		//Implement IDisposable.
+		public void Dispose()
+		{
+			Dispose(true);
+			// Below causes the Finalize (~Destructor) method to be skipped!!!
+			GC.SuppressFinalize(this); // Disallow GC to clean-up this because we just did it above using Dispose(true)...
+		}
+
+		protected virtual void Dispose(bool IsSuppressingFinalize)
+		{
+
+			if(AlreadyDisposed) return;
+
+			try
+			{
+				if(IsSuppressingFinalize)
+				{
+					// TO DO: clean up managed objects OR objects that are expecting a Dispose(bool) call
+					DisposeManagedResources();
+				}
+
+				// TO DO: clean up unmanaged objects or any other objects regardless of Dispose(bool) call
+				DisposeUnmanagedResources();
+				
+			}
+			catch(Exception e)
+			{
+				Console.WriteLine("" + e);
+			}
+
+			AlreadyDisposed = true;		
+		}
+
+		
+		//ONLY IF YOU MUST - If you want to implement Finalize method, it is recommended to use Finalize and Dispose method together as shown below...
+		//
+		//At runtime C# destructor is automatically Converted to Finalize method
+		~DelimitedTextReader()
+		{
+			Dispose(false);
+		}
+
+		// ***************************************************************************
+		// END DISPOSE IMPLEMENTATION
+		// ***************************************************************************
+
+
+		#endregion
+
+
+
+
+		#region fields
+
+		protected DataTable _CurrentDataTable = null;
 		Dictionary<string, Func<string,object,object>> _FieldOutputFormatter = new Dictionary<string, Func<string,object,object>>();	
 		Dictionary<string, Type> _FieldTypeMappings = new Dictionary<string, Type>();		
 		//protected string _FileName
@@ -62,6 +133,25 @@ namespace GR.Text
 		List<string> _CurrentRecord = null; 
 		List<List<string>> _Records = null;
 		
+		#endregion
+
+
+
+
+		#region properties
+
+		public DataTable CurrentDataTable 
+		{
+			get
+			{
+				return _CurrentDataTable;
+			}
+
+			set
+			{
+				_CurrentDataTable = value;
+			}
+		}
 
 		public Dictionary<string, Func<string,object,object>> FieldOutputFormatter
 		{
@@ -190,6 +280,7 @@ namespace GR.Text
 		{
 			get
 			{
+				if(_CurrentEncoding == null) _CurrentEncoding = Encoding.Default;
 				return _CurrentEncoding;
 			}
 
@@ -243,82 +334,39 @@ namespace GR.Text
 			}
 		}
 
-		
-		
-		#region IDisposable_impl
-
-		// ***************************************************************************
-		// BEGIN DISPOSE IMPLEMENTATION
-		// ***************************************************************************
-
-		// To keep track of Dispose calls in case it is called repeatedly for some reason...
-		private bool AlreadyDisposed = false;
-
-
-		//Implement IDisposable.
-		public void Dispose()
-		{
-			Dispose(true);
-			// Below causes the Finalize (~Destructor) method to be skipped!!!
-			GC.SuppressFinalize(this); // Disallow GC to clean-up this because we just did it above using Dispose(true)...
-		}
-
-		protected virtual void Dispose(bool IsSuppressingFinalize)
-		{
-
-			if(AlreadyDisposed) return;
-
-			try
-			{
-				if(IsSuppressingFinalize)
-				{
-					// TO DO: clean up managed objects OR objects that are expecting a Dispose(bool) call
-				}
-
-				// TO DO: clean up unmanaged objects or any other objects regardless of Dispose(bool) call
-				//this.Disconnect();
-				if(this.CurrentBinaryReader != null)
-				{
-					try
-					{
-						WriteLine("BEGIN - this.CurrentBinaryReader.Close()");
-						this.CurrentBinaryReader.Close();
-						WriteLine("END - this.CurrentBinaryReader.Close()");
-					}
-					catch(Exception e)
-					{
-						Console.WriteLine("" + e);
-					}
-				}
-			}
-			catch(Exception e)
-			{
-				Console.WriteLine("" + e);
-			}
-
-			AlreadyDisposed = true;		
-		}
-
-		
-		//ONLY IF YOU MUST - If you want to implement Finalize method, it is recommended to use Finalize and Dispose method together as shown below...
-		//
-		//At runtime C# destructor is automatically Converted to Finalize method
-		~DelimitedTextReader()
-		{
-			Dispose(false);
-		}
-
-		// ***************************************************************************
-		// END DISPOSE IMPLEMENTATION
-		// ***************************************************************************
-
-
 		#endregion
 
-			   
 
-		
-		
+
+
+
+		#region methods
+
+
+
+		protected virtual void DisposeUnmanagedResources()
+		{
+
+		}
+
+		protected virtual void DisposeManagedResources()
+		{
+			if(this.CurrentBinaryReader != null)
+			{
+				try
+				{
+					WriteLine("BEGIN - this.CurrentBinaryReader.Close()");
+					this.CurrentBinaryReader.Close();
+					WriteLine("END - this.CurrentBinaryReader.Close()");
+				}
+				catch(Exception e)
+				{
+					Console.WriteLine("" + e);
+				}
+			}
+		}
+
+
 
 
 
@@ -362,6 +410,26 @@ namespace GR.Text
 		}
 
 		
+
+		public void Read(TextReader stream)
+		{
+			if(stream == null)
+			{
+				// Error Message? Log?
+				return;
+			}
+
+			string str = stream.ReadToEnd();
+			byte[] byteArray = CurrentEncoding.GetBytes(str);
+			MemoryStream mstream = new MemoryStream( byteArray );
+
+			mstream.Position = 0; //set just to make sure...
+
+			this.Read(new BinaryReader(mstream, this.CurrentEncoding));				
+		}
+			
+
+
 		public void Read(Stream stream)
 		{
 			if(stream == null)
@@ -372,9 +440,7 @@ namespace GR.Text
 
 			this.Read(new BinaryReader(stream, this.CurrentEncoding));				
 		}
-
-
-		
+				
 
 		public void Read(BinaryReader binaryReader)
 		{
@@ -387,6 +453,7 @@ namespace GR.Text
 
 			this.MaxColumns = 0;
 			this.CurrentBinaryReader = binaryReader;
+			this.CurrentRecord = null;
 			this.Records.Clear();			
 			string CurrentBuffer = ""; // new StringBuilder();
 			
@@ -510,8 +577,7 @@ namespace GR.Text
 
 
 
-
-
+		
 
 		
 		public void SetFieldTypeMapping(string fieldName, Type typeMapping)
@@ -557,9 +623,7 @@ namespace GR.Text
 			}					
 		}
 
-
-
-		
+				
 		
 		public void SetFieldOutputFormatter(string fieldName, Func<string,object,object> formatterAction)
 		{
@@ -607,22 +671,65 @@ namespace GR.Text
 
 
 
+		// TODO - Using NewtonSoft, but might want to consider other options
+		public string SerializeToDataTable(DataTable dataTable)
+		{
+			string json = "";
 
-		public System.Data.DataTable GenerateDataTable(string tableName)
+			if(dataTable == null) return json;
+
+			json = Newtonsoft.Json.JsonConvert.SerializeObject(dataTable, Newtonsoft.Json.Formatting.Indented);
+
+			return json;
+		}
+
+		// TODO - Using NewtonSoft, but might want to consider other options
+		public DataTable DeserializeToDataTable(string json)
+		{
+			DataTable dataTable = null;
+
+			if(json == null) return dataTable;
+
+			if(json.Trim().Length <= 0) return dataTable;
+
+			//string msgContent = System.Text.Encoding.UTF8.GetString(json);
+			var tmpObject = JsonConvert.DeserializeObject<DataTable>(json);
+			dataTable = tmpObject as DataTable; // keep as simple as possible - no extra checking (below) for now...
+			//////if(tmpObject != null && tmpObject.GetType() == typeof(DataTable))
+			////if(tmpObject != null && typeof(DataTable).IsAssignableFrom(tmpObject.GetType()))
+			////{
+			////	dataTable = (DataTable)tmpObject;							
+			////}
+
+			return dataTable;
+		}
+
+
+
+		//_CurrentDataTable
+		//public System.Data.DataTable GenerateDataTable(string tableName)
+
+		public void InitializeDataTable()
+		{
+			InitializeDataTable(null);
+		}
+
+		public void InitializeDataTable(string tableName)
 		{
 			
-			System.Data.DataTable dataTable = null; // new System.Data.DataTable();
+			//System.Data.DataTable 
+			_CurrentDataTable = null; // new System.Data.DataTable();
 
 			if(this.Records.Count <= 0)
 			{
-				return dataTable;
+				return; // _CurrentDataTable;
 			}
 
-			dataTable = new System.Data.DataTable();
+			_CurrentDataTable = new System.Data.DataTable();
 
 			if(tableName == null || tableName.Trim().Length <= 0) tableName = "TABLE_" + DateTime.Now.Ticks;
 			
-			dataTable.TableName = tableName;
+			_CurrentDataTable.TableName = tableName;
 			
 			
 			if(this.HeaderRecordIndex >= 0 && this.HeaderRecordIndex < this.Records.Count)
@@ -637,21 +744,21 @@ namespace GR.Text
 
 						Type dataType = GetFieldTypeMapping(HeaderName);
 						if(dataType == null) dataType = typeof(string);
-						System.Data.DataColumn dc = dataTable.Columns.Add(HeaderName, dataType);
+						System.Data.DataColumn dc = _CurrentDataTable.Columns.Add(HeaderName, dataType);
 					}
 				}
 			}
 
-			if(this.MaxColumns > 0 && this.MaxColumns > dataTable.Columns.Count) // dataTable.Columns.Count <= 0 &&
+			if(this.MaxColumns > 0 && this.MaxColumns > _CurrentDataTable.Columns.Count) // dataTable.Columns.Count <= 0 &&
 			{
-				uint Max = this.MaxColumns - ((uint)(dataTable.Columns.Count));
+				uint Max = this.MaxColumns - ((uint)(_CurrentDataTable.Columns.Count));
 				for(uint c = 0; c < Max; ++c)
 				{
-					System.Data.DataColumn dc = dataTable.Columns.Add("Column" + c, typeof(string));
+					System.Data.DataColumn dc = _CurrentDataTable.Columns.Add("Column" + c, typeof(string));
 				}
 			}
 
-			dataTable.AcceptChanges();
+			_CurrentDataTable.AcceptChanges();
 			
 
 			for(int r = 0; r < this.Records.Count; ++r)
@@ -668,19 +775,18 @@ namespace GR.Text
 					dataRowValues.Add(Field);
 				}
 
-				System.Data.DataRow dataRow = dataTable.NewRow();
+				System.Data.DataRow dataRow = _CurrentDataTable.NewRow();
 				dataRow.ItemArray = dataRowValues.ToArray();
-				dataTable.Rows.Add(dataRow);
+				_CurrentDataTable.Rows.Add(dataRow);
 			}
 
 
-			dataTable.AcceptChanges();
+			_CurrentDataTable.AcceptChanges();
 
 			
-			return dataTable;
+			//return _CurrentDataTable;
 		}
-
-
+		
 
 
 
@@ -710,6 +816,7 @@ namespace GR.Text
 			return sortedTable;
 		}
 		
+		// NOT-USED - Just added in case we want to use a collection of "model" instances instead of the DataTable
 		public DataTable SortDataTable(System.Data.DataTable dataTable, SortComparer sortComparer)
 		{
 			DataTable sortedTable = dataTable;
@@ -839,7 +946,12 @@ namespace GR.Text
 			//}
 						
 		}
-		
+
+
+
+		#endregion
+
+
 
 
 	}

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Data;
+//using GR.TextIO;
 
-namespace GR.Text
+
+namespace GR.TextIO
 {
 	static class Program
 	{
@@ -117,8 +119,9 @@ namespace GR.Text
 			WriteLine("");
 			WriteLine("textReader.GenerateDataTable...");
 			WriteLine("");
-			DataTable dataTable = textReader.GenerateDataTable("Table 1");
-
+			//DataTable dataTable = textReader.GenerateDataTable("Table 1");
+			textReader.InitializeDataTable("CURRENT_TABLE");
+			System.Data.DataTable dataTable = textReader.CurrentDataTable;
 
 			WriteLine("");
 			WriteLine("textReader.SortDataTable...");

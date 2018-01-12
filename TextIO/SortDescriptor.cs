@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 
 
-namespace GR.Text
+namespace GR.TextIO
 {
 
     public class SortDescriptor // <T> where T : IComparable<T>

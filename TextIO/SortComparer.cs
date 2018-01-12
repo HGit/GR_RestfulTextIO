@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Data;
 
-namespace  GR.Text
+namespace GR.TextIO
 {
 
 
